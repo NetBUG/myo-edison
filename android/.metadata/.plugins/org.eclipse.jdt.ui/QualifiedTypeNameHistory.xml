@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="android.os.AsyncTask"/>
+<fullyQualifiedTypeName name="com.thalmic.android.sample.helloworld.R"/>
+<fullyQualifiedTypeName name="com.thalmic.android.sample.helloworld.R.id"/>
+<fullyQualifiedTypeName name="com.android.volley.RequestQueue"/>
+<fullyQualifiedTypeName name="com.android.volley.toolbox.Volley"/>
+<fullyQualifiedTypeName name="com.android.volley.VolleyError"/>
+<fullyQualifiedTypeName name="com.android.volley.Response"/>
+<fullyQualifiedTypeName name="com.android.volley.toolbox.StringRequest"/>
+<fullyQualifiedTypeName name="com.android.volley.Request"/>
+<fullyQualifiedTypeName name="com.thalmic.android.sample.helloworld.R.string"/>
+<fullyQualifiedTypeName name="com.thalmic.myo.Myo.VibrationType"/>
+</qualifiedTypeNameHistroy>
