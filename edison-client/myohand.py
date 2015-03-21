@@ -22,7 +22,7 @@ for analogpin in analogpins:
 # Set pin 13 to be used as an output GPIO pin.
 for pin in outpins:
     gpio.pinMode(pin, gpio.PWM)
-    setPWMPeriod(pin, 20000000)
+    gpio.setPWMPeriod(10, 20000000)
 
 #print 'Analog reading from pin %d now...' % analogpin
 try:
