@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;com.thalmic.android.sample.helloworld&apos; to &apos;com.netbug.myohand&apos;&#x0A;- Original project: &apos;HelloWorld&apos;&#x0A;- Original element: &apos;HelloWorld/src/com.thalmic.android.sample.helloworld&apos;&#x0A;- Renamed element: &apos;HelloWorld/src/com.netbug.myohand&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings&#x0A;- Rename subpackages of the package" description="Rename package &apos;com.thalmic.android.sample.helloworld&apos;" flags="589830" hierarchical="true" id="org.eclipse.jdt.ui.rename.package" input="/src&lt;com.thalmic.android.sample.helloworld" name="com.netbug.myohand" qualified="false" references="true" stamp="1426945814099" textual="false" version="1.0"/>
+</session>
