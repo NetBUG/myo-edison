@@ -124,10 +124,6 @@ public class HelloWorldActivity extends Activity {
                     mTextView.setText(getString(R.string.hello_world));
                     break;
                 case REST:
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=rest");
-                    }
                 case DOUBLE_TAP:
                     int restTextId = R.string.hello_world;
                     switch (myo.getArm()) {

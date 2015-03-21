@@ -124,10 +124,6 @@ public class HelloWorldActivity extends Activity {
                     mTextView.setText(getString(R.string.hello_world));
                     break;
                 case REST:
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=rest");
-                    }
                 case DOUBLE_TAP:
                     int restTextId = R.string.hello_world;
                     switch (myo.getArm()) {
@@ -142,10 +138,6 @@ public class HelloWorldActivity extends Activity {
                     break;
                 case FIST:
                     mTextView.setText(getString(R.string.pose_fist));
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=fist");
-                    }
                     break;
                 case WAVE_IN:
                     mTextView.setText(getString(R.string.pose_wavein));
@@ -155,10 +147,6 @@ public class HelloWorldActivity extends Activity {
                     break;
                 case FINGERS_SPREAD:
                     mTextView.setText(getString(R.string.pose_fingersspread));
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=flat");
-                    }
                     break;
             }
 
