@@ -8,7 +8,7 @@ import requests
 # Create a new instance of the GPIOEdison class.
 # Setting debug=True gives information about the interaction with sysfs.
 gpio = GPIO(debug=False)
-outpins = [9, 10]
+outpin = 3
 analogpins = range(14, 17)
 url_finger = "http://dev.studalt.ru/store.php?mode=r&id=finger"
 url_sensor = "http://dev.studalt.ru/store.php?mode=w&id=sensor"
@@ -20,9 +20,8 @@ for analogpin in analogpins:
     gpio.pinMode(analogpin, gpio.ANALOG_INPUT)
 
 # Set pin 13 to be used as an output GPIO pin.
-for pin in outpins:
-    gpio.pinMode(pin, gpio.PWM)
-    gpio.setPWMPeriod(10, 20000000)
+gpio.setPWMPeriod(outpin, 20000000)
+gpio.pinMode(outpin, gpio.PWM)
 
 #print 'Analog reading from pin %d now...' % analogpin
 try:
@@ -30,15 +29,21 @@ try:
 	data = []
 	level = 12
 	for analogpin in analogpins:
-            data.append(gpio.analogRead(analogpin))
-	l = requests.get(url_sensor + "&data=" + str(data))
+         data.append(gpio.analogRead(analogpin))
+    data = 'no'	# low, med, high
 	l = requests.get(url_finger + "&data=" + str(data))
+	l = requests.get(url_sensor)
 	if l.status_code == 200:
-	    level = int(l.text)
+	    switch(l.text.toLower()):
+			case 'fist':
+				level = 13
+			case 'spread':
+				level = 6
+			case 'rest':
+				level = 10
 
-	for pin in outpins:
-	    gpio.analogWrite(pin, level)
-        time.sleep(1023.0)
+	gpio.analogWrite(pin, level)
+	time.sleep(100.0)
 
 # When you get tired of seeing the led blinking kill the loop with Ctrl-C.
 except KeyboardInterrupt:
