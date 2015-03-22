@@ -42,6 +42,7 @@ public class HelloWorldActivity extends Activity {
     private TextView mTextView;
     RequestQueue queue;
     int queueSize = 0;
+    Myo.VibrationType vibe = null;
 	TextView txtView;
 
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
@@ -53,9 +54,9 @@ public class HelloWorldActivity extends Activity {
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
             mTextView.setTextColor(Color.CYAN);
-            //txtView = (TextView) findViewById(R.id.TextViewIP);
             this.updateText(getString(R.string.connecting));
             queue = Volley.newRequestQueue(getBaseContext());
+            txtView = (TextView) findViewById(R.id.TextViewIP);
         }
 
         // onDisconnect() is called whenever a Myo has been disconnected.
@@ -115,7 +116,6 @@ public class HelloWorldActivity extends Activity {
 	           @Override
 	           public void onResponse(String response) {
 	               // Display the first 500 characters of the response string.
-	        	   updateText("OK!");
 	        	   queueSize--;
 	           }
 	       }, new Response.ErrorListener() {
@@ -133,14 +133,33 @@ public class HelloWorldActivity extends Activity {
 	                   new Response.Listener<String>() {
 	           @Override
 	           public void onResponse(String response) {
+	         	   updateText("Got " + response + " vs " + getString(R.string.low));
 	        	   queueSize--;
 	               // Display the first 500 characters of the response string.
-	        	   if (response == getString(R.string.low))
-	        		   myo.vibrate(VibrationType.SHORT);
-	        	   if (response == getString(R.string.medium))
-	        		   myo.vibrate(VibrationType.MEDIUM);
-	        	   if (response == getString(R.string.high))
-	        		   myo.vibrate(VibrationType.LONG);
+	        	   if (response.trim().startsWith(getString(R.string.low)))
+	        	   {
+	        		   if (vibe != VibrationType.SHORT)
+	        		   {
+	        			   myo.vibrate(VibrationType.SHORT);
+	        			   vibe = VibrationType.SHORT;
+	        		   }
+	        	   }
+	        	   else if (response.trim().startsWith(getString(R.string.medium)))
+	        	   {
+	        		   if (vibe != VibrationType.MEDIUM)
+	        		   {
+	        			   vibe = VibrationType.MEDIUM;
+	        			   myo.vibrate(vibe);
+	        		   }
+	        	   }
+	        	   else if (response.trim().startsWith(getString(R.string.high)))
+	        	   {
+	        		   if (vibe != VibrationType.LONG)
+	        		   {
+	        			   vibe = VibrationType.LONG;
+	        			   myo.vibrate(vibe);
+	        		   }
+	        	   } else vibe = null;
 		           }
 		       }, new Response.ErrorListener() {
 		           @Override
