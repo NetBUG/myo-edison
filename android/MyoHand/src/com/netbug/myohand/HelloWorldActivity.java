@@ -10,6 +10,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.AsyncTask.Status;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.thalmic.android.sample.helloworld.R;
+import com.netbug.myohand.R;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -39,7 +40,9 @@ public class HelloWorldActivity extends Activity {
 
     private TextView mLockStateView;
     private TextView mTextView;
-    PostTask bgTask = null;
+    RequestQueue queue;
+    int queueSize = 0;
+	TextView txtView;
 
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
     // If you do not override an event, the default behavior is to do nothing.
@@ -50,6 +53,9 @@ public class HelloWorldActivity extends Activity {
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
             mTextView.setTextColor(Color.CYAN);
+            //txtView = (TextView) findViewById(R.id.TextViewIP);
+            this.updateText(getString(R.string.connecting));
+            queue = Volley.newRequestQueue(getBaseContext());
         }
 
         // onDisconnect() is called whenever a Myo has been disconnected.
@@ -87,7 +93,67 @@ public class HelloWorldActivity extends Activity {
         public void onLock(Myo myo, long timestamp) {
             mLockStateView.setText(R.string.locked);
         }
+        
+	    protected void updateText(final String s) {
+	    	runOnUiThread(new Runnable() {
+	               @Override
+	               public void run() {
+	            	  if (txtView != null)
+	            		  txtView.setText(s);       
+	               }
+	            });
+	    }
 
+	    protected void sendData(String url, String params, Boolean force, final Myo myo) {
+	    	if (queueSize > 2 && !force)
+	    		return;
+	    	queueSize++;
+
+	       // Request a string response from the provided URL.
+	       StringRequest stringRequest = new StringRequest(Request.Method.GET, url + params,
+	                   new Response.Listener<String>() {
+	           @Override
+	           public void onResponse(String response) {
+	               // Display the first 500 characters of the response string.
+	        	   updateText("OK!");
+	        	   queueSize--;
+	           }
+	       }, new Response.ErrorListener() {
+	           @Override
+	           public void onErrorResponse(VolleyError error) {
+	               updateText("Edison connection error!");
+	        	   queueSize--;
+	           }
+	       });
+	       // Add the request to the RequestQueue.
+	       queue.add(stringRequest);
+	       if (myo != null)
+	       {
+		       stringRequest = new StringRequest(Request.Method.GET, getString(R.string.url_get),
+	                   new Response.Listener<String>() {
+	           @Override
+	           public void onResponse(String response) {
+	        	   queueSize--;
+	               // Display the first 500 characters of the response string.
+	        	   if (response == getString(R.string.low))
+	        		   myo.vibrate(VibrationType.SHORT);
+	        	   if (response == getString(R.string.medium))
+	        		   myo.vibrate(VibrationType.MEDIUM);
+	        	   if (response == getString(R.string.high))
+	        		   myo.vibrate(VibrationType.LONG);
+		           }
+		       }, new Response.ErrorListener() {
+		           @Override
+		           public void onErrorResponse(VolleyError error) {
+		        	   queueSize--;
+		               updateText("Edison connection error!");
+		           }
+		       });
+		       // Add the request to the RequestQueue.
+		       queue.add(stringRequest);
+	       }
+        }	// sendData()
+	    
         // onOrientationData() is called whenever a Myo provides its current orientation,
         // represented as a quaternion.
         @Override
@@ -103,10 +169,7 @@ public class HelloWorldActivity extends Activity {
                 pitch *= -1;
             }
             
-            if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-            {
-            	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=accel&data=");
-            }
+           	sendData(getString(R.string.url_set_accel), "" + roll + "," + pitch + "," + yaw, false, myo);
 
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
             mTextView.setRotation(roll);
@@ -124,10 +187,7 @@ public class HelloWorldActivity extends Activity {
                     mTextView.setText(getString(R.string.hello_world));
                     break;
                 case REST:
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=rest");
-                    }
+                    sendData(getString(R.string.url_set), getString(R.string.pose_rest), true, null);
                 case DOUBLE_TAP:
                     int restTextId = R.string.hello_world;
                     switch (myo.getArm()) {
@@ -137,15 +197,14 @@ public class HelloWorldActivity extends Activity {
                         case RIGHT:
                             restTextId = R.string.arm_right;
                             break;
+					default:
+						break;
                     }
                     mTextView.setText(getString(restTextId));
                     break;
                 case FIST:
                     mTextView.setText(getString(R.string.pose_fist));
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=fist");
-                    }
+                    sendData(getString(R.string.url_set), getString(R.string.pose_fist), true, null);
                     break;
                 case WAVE_IN:
                     mTextView.setText(getString(R.string.pose_wavein));
@@ -155,10 +214,7 @@ public class HelloWorldActivity extends Activity {
                     break;
                 case FINGERS_SPREAD:
                     mTextView.setText(getString(R.string.pose_fingersspread));
-                    if (bgTask == null || bgTask.getStatus() == AsyncTask.Status.FINISHED)
-                    {
-                    	bgTask = (PostTask) new PostTask().execute("http://dev.studalt.ru/store.php?mode=w&id=sensor&data=flat");
-                    }
+                    sendData(getString(R.string.url_set), getString(R.string.pose_fingersspread), true, null);
                     break;
             }
 
@@ -233,61 +289,5 @@ public class HelloWorldActivity extends Activity {
         // Launch the ScanActivity to scan for Myos to connect to.
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
-    }
-    
-    // The definition of our task class
-    private class PostTask extends AsyncTask<String, Integer, String> {
-    	TextView txtView;
-	    @Override
-	    protected void onPreExecute() {
-	       super.onPreExecute();
-	       txtView = (TextView) findViewById(R.id.TextViewIP);
-	       this.updateText(getString(R.string.connecting));
-	    }
-	    
-	    protected void updateText(final String s) {
-	    	runOnUiThread(new Runnable() {
-	               @Override
-	               public void run() {
-	                  txtView.setText(s);       
-	               }
-	            });
-	    }
-	  
-	    @Override
-	    protected String doInBackground(String... params) {
-	       String url=params[0];
-	  
-	    // Instantiate the RequestQueue.
-	       RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-
-	       // Request a string response from the provided URL.
-	       StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-	                   new Response.Listener<String>() {
-	           @Override
-	           public void onResponse(String response) {
-	               // Display the first 500 characters of the response string.
-	        	   updateText("OK!");
-	           }
-	       }, new Response.ErrorListener() {
-	           @Override
-	           public void onErrorResponse(VolleyError error) {
-	               updateText("Edison connection error!");
-	           }
-	       });
-	       // Add the request to the RequestQueue.
-	       queue.add(stringRequest);
-	       return "Queued";
-	    }
-	  
-	    @Override
-	    protected void onProgressUpdate(Integer... values) {
-	    }
-	  
-	    @Override
-	    protected void onPostExecute(String result) {
-	    	ComponentName a = getCallingActivity();
-	    	
-	    }
     }
 }
