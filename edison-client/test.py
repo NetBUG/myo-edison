@@ -8,6 +8,6 @@ time.sleep(1)
 while 1:
 	print "Cycle..."
 	gpio.analogWrite(3, 6)
-	time.sleep(1.5)
-	gpio.analogWrite(3, 15)
-	time.sleep(1.5)
+	time.sleep(3)
+	gpio.analogWrite(3, 16)
+	time.sleep(3)
