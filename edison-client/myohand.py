@@ -31,6 +31,12 @@ try:
 	for analogpin in analogpins:
          data.append(gpio.analogRead(analogpin))
     data = 'no'	# low, med, high
+    if (data < 998):
+		data = 'low'
+		if (data < 990):
+			data = 'med'
+			if (data < 970):
+				data = 'high'
 	l = requests.get(url_finger + "&data=" + str(data))
 	l = requests.get(url_sensor)
 	if l.status_code == 200:
