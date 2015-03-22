@@ -13,6 +13,6 @@ while 1:
 	time.sleep(3)
 	gpio.analogWrite(3, 16)
 	time.sleep(2)
-	print "14: " + gpio.analogRead(14)
-	print "15: " + gpio.analogRead(15)
+	print "14: " + str(gpio.analogRead(14))
+	print "15: " + str(gpio.analogRead(15))
 	time.sleep(1)
