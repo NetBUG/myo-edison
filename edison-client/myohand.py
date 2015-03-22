@@ -24,12 +24,12 @@ gpio.setPWMPeriod(outpin, 20000000)
 gpio.pinMode(outpin, gpio.PWM)
 
 #print 'Analog reading from pin %d now...' % analogpin
-try:
-    while(True):
-	data = []
-	level = 12
-	for analogpin in analogpins:
-         data.append(gpio.analogRead(analogpin))
+while(True):
+    data = []
+    level = 12
+    gpio.analogWrite(outpin, level)
+    for analogpin in analogpins:
+        data.append(gpio.analogRead(analogpin))
     data = 'no'	# low, med, high
     if (data < 998):
 		data = 'low'
@@ -37,25 +37,27 @@ try:
 			data = 'med'
 			if (data < 970):
 				data = 'high'
-	l = requests.get(url_finger + "&data=" + str(data))
-	l = requests.get(url_sensor)
-	if l.status_code == 200:
-	    switch(l.text.toLower()):
-			case 'fist':
-				level = 13
-			case 'spread':
-				level = 6
-			case 'rest':
-				level = 10
-
-	gpio.analogWrite(pin, level)
-	time.sleep(100.0)
+    print "Writing to dev.studalt.ru..."
+    l = requests.get(url_sensor + "&data=" + str(data))
+    print "Reading gesture..."
+    l = requests.get(url_finger)
+    if l.status_code == 200:
+	print "DEBUG: " + l.text
+	if l.text.lower() == 'fist':
+		level = 14
+	elif l.text.lower() == 'spread':
+		level = 10
+	elif l.text.lower() == 'rest':
+		level = 12
+    print "Level: " + str(level) + ", sensors: " + str(data)
+    gpio.analogWrite(outpin, level)
+    #time.sleep(0.2)
 
 # When you get tired of seeing the led blinking kill the loop with Ctrl-C.
-except KeyboardInterrupt:
+#except KeyboardInterrupt:
     # Leave the led turned off.
-    print '\nCleaning up...'
+#    print '\nCleaning up...'
     #gpio.digitalWrite(outpin, gpio.LOW)
 
     # Do a general cleanup. Calling this function is not mandatory.
-    gpio.cleanup()
+#    gpio.cleanup()
